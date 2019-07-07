@@ -1,5 +1,5 @@
 var mysql = require('mysql');
-
+var Table = require('cli-table2');
 var inquirer = require('inquirer');
 
 // mysql connection parameters
@@ -18,7 +18,7 @@ var inquirer = require('inquirer');
     database: "bamazon"
   });
 
-  connection.connect(function(err) {
+  /*connection.connect(function(err) {
     if (err) throw err;
     console.log("connected as id " + connection.threadId + "\n");
     //startPromt();
@@ -26,6 +26,8 @@ var inquirer = require('inquirer');
 
   });
 
+
+/*
   function startPromt(){
       inquirer.prompt([{
           type:"confirm",
@@ -48,18 +50,17 @@ var inquirer = require('inquirer');
         type: 'input',
 			name: 'item_id',
 			message: 'Please enter the Item ID which you would like to purchase.',
-			
 			filter: Number
 
     },
     {
         type: 'input',
         name: 'quantity',
-        message: 'Please give an amount needed.',
-       
-        filter: Number 
+        message: 'Please give an amount needed.',   
+        filter: Number
+    },
 
-    }
+    
     ]).then(function(input){
         var item = input.item_id;
         var quantity = input.quantity;
@@ -93,35 +94,37 @@ var inquirer = require('inquirer');
         })
     })
 
-  }
+  }*/
 
   function showInventory(){
-      queryString = 'SELECT * FROM products';
+      
     
-      connection.query(queryString, function(err, data){
+      connection.query('SELECT * FROM products', function(err,res){
         if (err) throw err;
+        console.log("Welocme to Bamazon!!")
+        console.log("------------------------");
         console.log("Availible Inventory");
-        console.log("................\n");
-
-        var string = " ";
-        for(var i = 0; i < data.length; i++){
-             string = "";
-            string += "Item ID:" + data[i].item_id + " // ";  
-            string += 'Product Name: ' + data[i].product_name + '  //  ';
-			string += 'Department: ' + data[i].department_name + '  //  ';
-            string += 'Price: $' + data[i].price + '\n';
-
-            console.log(string);
-        }
         console.log("------------------------");
 
-        promptUserSelection();
-      })
-  }
-
+        //promptUserSelection();
      
+      var table = new Table({
+        head: ['Product Id', 'Product Name', 'Price', 'QTY'], 
+        colWidths: [12, 50, 8,8],
+        colAligns: ["center", "left", "right","right" ],
+    });
+
+    for(i = 0; i < res.length; i++){
+        table.push([res[i].item_id,res[i].product_name, res[i].price, res[i].stock_quantity]);
+    }
+    console.log(table.toString());
+    console.log("-------------------\n");
+});
+  };
+
+  showInventory();   
     
     
    
 
-  
+ 
