@@ -21,7 +21,9 @@ var inquirer = require('inquirer');
   connection.connect(function(err) {
     if (err) throw err;
     console.log("connected as id " + connection.threadId + "\n");
-    startPromt();
+    //startPromt();
+    showInventory();
+
   });
 
   function startPromt(){
@@ -33,7 +35,6 @@ var inquirer = require('inquirer');
       }]).then(function(user){
           if (user.confirm === true){
               startBamazon();
-              showInventory();
           }else{
               console.log("Thanks for visiting!");
           }
@@ -47,7 +48,7 @@ var inquirer = require('inquirer');
         type: 'input',
 			name: 'item_id',
 			message: 'Please enter the Item ID which you would like to purchase.',
-			validate: validateInput,
+			
 			filter: Number
 
     },
@@ -55,7 +56,7 @@ var inquirer = require('inquirer');
         type: 'input',
         name: 'quantity',
         message: 'Please give an amount needed.',
-        validate: validateInput,
+       
         filter: Number 
 
     }
@@ -72,20 +73,20 @@ var inquirer = require('inquirer');
                 console.log("ERROR: invalid id");
                 showInventory();
             }else
-            var productInfo = data[0];
+            var productData = data[0];
 
-            if (quantity <= productInfo.stock_quantity){
+            if (quantity <= productData.stock_quantity){
                 console.log("The requested item is in stock");
 
-                var upadateQue = "UPDATE products SET stock_quantity = " + (productInfo.stock_quantity - quantity) + "WHERE item_id =" + item;
+                var upadateQue = "UPDATE products SET stock_quantity = " + (productData.stock_quantity - quantity) + "WHERE item_id =" + item;
 
                 connection.query(upadateQue, function(err, data){
                     if (err) throw err; 
-                    console.log("Your order has been place" + productInfo.price * quantity);
+                    console.log("Your order has been place" + productData.price * quantity);
                     connection.end();
                 })
             }else{
-                console.log("sorry, the product" + productInfo.product_name + "is not in stock");
+                console.log("sorry, the product" + productData.product_name + "is not in stock");
                 console.log("please update your order.");
                 showInventory();
             }
@@ -95,32 +96,32 @@ var inquirer = require('inquirer');
   }
 
   function showInventory(){
-      que = "SELECT * FROM products";
+      queryString = 'SELECT * FROM products';
     
-      connection.query(que, function(err, data){
+      connection.query(queryString, function(err, data){
         if (err) throw err;
         console.log("Availible Inventory");
-        console.log("................\n")
+        console.log("................\n");
 
-        var storage = "";
-        for(var i = 0; i < data.lenth; i++){
-             storage = "";
-            storage += "Item ID:" + data[i].item_id + " // ";  
-            strOut += 'Product Name: ' + data[i].product_name + '  //  ';
-			strOut += 'Department: ' + data[i].department_name + '  //  ';
-            strOut += 'Price: $' + data[i].price + '\n';
-            console.log(storage);
+        var string = " ";
+        for(var i = 0; i < data.length; i++){
+             string = "";
+            string += "Item ID:" + data[i].item_id + " // ";  
+            string += 'Product Name: ' + data[i].product_name + '  //  ';
+			string += 'Department: ' + data[i].department_name + '  //  ';
+            string += 'Price: $' + data[i].price + '\n';
+
+            console.log(string);
         }
-        console.log("------------------------")
+        console.log("------------------------");
 
         promptUserSelection();
       })
+  }
 
-    } 
+     
     
     
-    function startBamazon(){
-        showInventory();
-    }
+   
 
   
