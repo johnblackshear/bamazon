@@ -17,4 +17,28 @@ var inquire = require("inquire");
     password: "",
     database: "bamazon"
   });
+
+  connection.connect(function(err) {
+    if (err) throw err;
+    console.log("connected as id " + connection.threadId + "\n");
+    startPromt();
+  });
+
+  function startPromt(){
+      inquire.prompt([{
+          type:"confirm",
+          name:"confirm",
+          message:"welcome would you like to veiw our invetory?",
+          default:"true"
+      }]).then(function(user){
+          if (user.confirm === "true"){
+              stock();
+          }else{
+              console.log("Thanks for visiting!");
+          }
+      });
+  }
+
+  
+
   
