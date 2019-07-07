@@ -29,7 +29,7 @@ var inquirer = require('inquirer');
           type:"confirm",
           name:"confirm",
           message:"welcome would you like to veiw our invetory?",
-          default:"true"
+          default:true
       }]).then(function(user){
           if (user.confirm === true){
               startBamazon();
