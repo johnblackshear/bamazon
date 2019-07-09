@@ -47,10 +47,10 @@ var inquirer = require('inquirer');
 
     inquirer.prompt([
     {
+        name: 'item_id',
         type: 'input',
-			name: 'item_id',
-			message: 'Please enter the Item ID which you would like to purchase.',
-			filter: Number
+		message: 'Please enter the Item ID which you would like to purchase.',
+			
 
     },
     {
@@ -96,7 +96,7 @@ var inquirer = require('inquirer');
 
   }*/
 
-  function showInventory(){
+function showInventory(){
       
     
       connection.query('SELECT * FROM products', function(err,res){
@@ -119,12 +119,55 @@ var inquirer = require('inquirer');
     }
     console.log(table.toString());
     console.log("-------------------\n");
+    promptUserSelection();
 });
-  };
+};
+
+var  promptUserSelection = function(){
+
+    inquirer.prompt({
+    
+        name: 'selectedProduct',
+        type: 'input',
+		message: 'Please enter the Item ID which you would like to purchase.',
+    
+    })
+    .then(function(answer1){
+        var selected = answer1.selectedProduct;
+        connection.query("SELECT * FROM products WHERE item_id=?",selected, function(err,res){
+           if(err) throw err;
+           if (res === 0){
+               console.log("Item is not in inventory, please select from listed items.");
+            promptUserSelection();
+           }else{
+            inquirer.prompt({
+                name: "quantity",
+                type: "input",
+                message: "How many of this item would you like to purchase?"
+            })
+            .then(function(answer2){
+                var selectedQty = answer2.quantity;
+                if (selectedQty > res[0].stock_quantity){
+                console.log("Sorry " + res[0].product_name + " only has " + res[0].stock_quantity + " availible items");
+                promptUserSelection();
+                }else{
+                    console.log("there is enough in stock");
+                }
+            })
+           }
+        });
+    });
+};        
+           
+        
+
+
+
+
 
   showInventory();   
     
-    
+
    
 
  
